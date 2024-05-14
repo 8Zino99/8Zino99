@@ -52,47 +52,59 @@ end
 
 local function toggleAiming()
     aiming = not aiming
+    if aiming then
+        targetPlayer = findNearestPlayer()
+    end
 end
 
 local function aimAtPlayer(player)
     if player and player.Character then
         local playerHeadPosition = player.Character.Head.Position
         local playerBodyPosition = player.Character.HumanoidRootPart.Position
-        local aimPosition = playerHeadPosition + Vector3.new(0, 2, 0) -- Offset for camera position above player's head
+        local aimPosition = playerHeadPosition + Vector3.new(0, 2, 0)
         Camera.CFrame = CFrame.new(aimPosition, playerBodyPosition)
     end
 end
 
 local function findNearestPlayer()
-    -- This function has already been implemented
+    local nearestDistance = math.huge
+    local nearestPlayer = nil
+    local localPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer and player.Character then
+            local distance = (player.Character.HumanoidRootPart.Position - localPosition).magnitude
+            if distance < nearestDistance then
+                nearestDistance = distance
+                nearestPlayer = player
+            end
+        end
+    end
+    return nearestPlayer
 end
 
 local function updateCamera()
-    -- This function has already been implemented
+    -- Implementiere die Aktualisierung der Kamera
 end
 
 local function checkPlayerInSight()
-    -- This function has already been implemented
+    -- Implementiere die Überprüfung, ob ein Spieler im Blick ist
 end
 
 UserInputService.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.RightShift then -- Right Shift key to toggle aiming
+    if input.KeyCode == Enum.KeyCode.RightShift then
         toggleAiming()
-    elseif input.KeyCode == Enum.KeyCode.LeftControl then -- Left Control key for shooting
-        -- Implement shooting functionality here
+    elseif input.KeyCode == Enum.KeyCode.LeftControl then
+        -- Füge hier die Schussfunktionalität ein
     end
 end)
 
 while true do
-    if aiming then
-        targetPlayer = findNearestPlayer()
-        if targetPlayer then
-            aimAtPlayer(targetPlayer)
-        end
+    if aiming and targetPlayer then
+        aimAtPlayer(targetPlayer)
     else
         updateCamera()
     end
     checkPlayerInSight()
     updateESP()
-    RunService.RenderStepped:Wait() -- Wait for render step for smooth update
+    RunService.RenderStepped:Wait()
 end
